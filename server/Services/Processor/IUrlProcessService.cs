@@ -7,5 +7,6 @@ namespace PodNoms.Api.Services.Processor {
         Task<AudioType> GetInformation(int entryId);
         Task<AudioType> GetInformation(PodcastEntry entry);
         Task<bool> DownloadAudio(int entryId);
+        Task<bool> IsValidUrl(string url);
     }
 }

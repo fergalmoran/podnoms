@@ -74,12 +74,18 @@ namespace PodNoms.Api.Controllers {
             // first check url is valid
             var entry = _mapper.Map<PodcastEntryViewModel, PodcastEntry>(item);
             var podcast = await _podcastRepository.GetAsync(item.PodcastId);
+            //check if we have an existing title, if so use it.
+            var title = string.IsNullOrEmpty(item.Title) ? string.Empty : item.Title;
+
             if (podcast != null) {
                 var status = await _processor.GetInformation(entry);
                 if (status == AudioType.Valid) {
                     if (entry.ProcessingStatus == ProcessingStatus.Processing) {
                         if (string.IsNullOrEmpty(entry.ImageUrl)) {
                             entry.ImageUrl = $"{_storageSettings.CdnUrl}static/images/default-entry.png";
+                        }
+                        if (!string.IsNullOrEmpty(title)) {
+                            entry.Title = title;
                         }
                         entry.Podcast = podcast;
                         entry.Processed = false;

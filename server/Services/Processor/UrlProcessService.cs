@@ -114,6 +114,10 @@ namespace PodNoms.Api.Services.Processor {
             }
             return false;
         }
-
+        public async Task<bool> IsValidUrl(string url) {
+            var downloader = new AudioDownloader(url, _applicationsSettings.Downloader);
+            var result = await downloader.GetInfo();
+            return result == AudioType.Valid;
+        }
     }
 }

@@ -28,7 +28,7 @@ export class PodcastAddUrlFormComponent implements AfterViewInit {
         this.vc.nativeElement.focus();
     }
     isValidURL(str) {
-        var a = document.createElement('a');
+        const a = document.createElement('a');
         a.href = str;
         return a.host && a.host != window.location.host;
     }
