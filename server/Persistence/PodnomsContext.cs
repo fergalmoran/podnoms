@@ -1,14 +1,16 @@
 using System;
 using System.IO;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using PodNoms.Api.Models;
+using PodNoms.Api.Services.Auth;
 
 namespace PodNoms.Api.Persistence {
 
-    public class PodnomsDbContext : DbContext {
+    public class PodnomsDbContext : IdentityDbContext<ApplicationUser> {
         public PodnomsDbContext(DbContextOptions<PodnomsDbContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder) {
@@ -27,15 +29,10 @@ namespace PodNoms.Api.Persistence {
                 .Property(b => b.CreateDate)
                 .HasDefaultValueSql("getdate()");
 
-            modelBuilder.Entity<User>()
-                .HasIndex(e => e.Slug)
-                 .IsUnique(true);
-
         }
 
         public DbSet<Podcast> Podcasts { get; set; }
         public DbSet<PodcastEntry> PodcastEntries { get; set; }
         public DbSet<Playlist> Playlists { get; set; }
-        public DbSet<User> Users { get; set; }
     }
 }

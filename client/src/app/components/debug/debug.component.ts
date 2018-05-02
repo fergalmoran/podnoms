@@ -29,40 +29,35 @@ export class DebugComponent implements OnInit {
         private _signalrService: SignalRService
     ) {}
     ngOnInit() {
-        this._debugService.ping().subscribe(r => (this.pingPong = r));
+        this._debugService.ping().subscribe((r) => (this.pingPong = r));
         this.debugInfo$ = this._debugService.getDebugInfo();
     }
 
-    subscribeToServerPush() {
-        this._pushNotifications.getPermission();
-        this._pushNotifications.receiveMessage();
-        this.message$ = this._pushNotifications.currentMessage;
-    }
-    sendServerPush() {
+    requestPushCallback() {
         this._debugService
             .sendPush()
-            .subscribe(r =>
+            .subscribe((r) =>
                 console.log('debug.component', 'sendServerPush', r)
             );
     }
     processOrphans() {
         this._jobsService
             .processOrphans()
-            .subscribe(e =>
+            .subscribe((e) =>
                 console.log('debug.component.ts', 'processOrphans', e)
             );
     }
     processPlaylists() {
         this._jobsService
             .processPlaylists()
-            .subscribe(e =>
+            .subscribe((e) =>
                 console.log('debug.component.ts', 'processPlaylists', e)
             );
     }
     updateYouTubeDl() {
         this._jobsService
             .updateYouTubeDl()
-            .subscribe(e =>
+            .subscribe((e) =>
                 console.log('debug.component.ts', 'updateYouTubeDl', e)
             );
     }

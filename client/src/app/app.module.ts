@@ -1,5 +1,4 @@
 import { GlobalsService } from './services/globals.service';
-import { CallbackComponent } from './components/callback/callback.component';
 import { PodcastUploadFormComponent } from './components/podcast/podcast-upload-form/podcast-upload-form.component';
 import { PodcastAddUrlFormComponent } from './components/podcast/podcast-add-url-form/podcast-add-url-form.component';
 import { PodcastAddFormComponent } from './components/podcast/podcast-add-form/podcast-add-form.component';
@@ -12,10 +11,14 @@ import { ProgressbarModule } from 'ngx-bootstrap/progressbar';
 import { AngularFireDatabaseModule } from 'angularfire2/database';
 import { AngularFireAuthModule } from 'angularfire2/auth';
 import { AngularFireModule } from 'angularfire2';
+import { SocialLoginModule, AuthServiceConfig } from 'angularx-social-login';
+import {
+    GoogleLoginProvider,
+    FacebookLoginProvider
+} from 'angularx-social-login';
 
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { AuthGuard } from './services/auth.guard';
-import { AuthConfig, AuthHttp } from 'angular2-jwt';
 import { ImageService } from './services/image.service';
 import { DebugService } from './services/debug.service';
 import { ChatterService } from './services/chatter.service';
@@ -31,7 +34,7 @@ import { AppComponent } from './app.component';
 import { HomeComponent } from './components/home/home.component';
 import { LoginComponent } from './components/login/login.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
-import { AuthService } from './services/auth.service';
+import { PodnomsAuthService } from './services/podnoms-auth.service';
 import { ProfileService } from './services/profile.service';
 import { MomentModule } from 'angular2-moment';
 import { FilterEntryPipe } from './pipes/filter-entry.pipe';
@@ -58,17 +61,28 @@ import { AppInsightsService } from 'app/services/app-insights.service';
 import { MessagingService } from './services/messaging.service';
 
 import { environment } from 'environments/environment';
+import { FooterPlayerComponent } from 'app/components/footer-player/footer-player.component';
+import { AudioService } from 'app/services/audio.service';
+import { HumaniseTimePipe } from './pipes/humanise-time.pipe';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
+import { PodNomsApiInterceptor } from './interceptors/podnoms-api.interceptor';
+import { SideOverlayComponent } from './components/side-overlay/side-overlay.component';
+import { UiStateService } from './services/ui-state.service';
 
-export function authHttpServiceFactory(http: Http, options: RequestOptions) {
-    return new AuthHttp(
-        new AuthConfig({
-            noClientCheck: true,
-            globalHeaders: [{ 'Content-Type': 'application/json' }],
-            tokenGetter: () => localStorage.getItem('id_token')
-        }),
-        http,
-        options
-    );
+const config = new AuthServiceConfig([
+    {
+        id: GoogleLoginProvider.PROVIDER_ID,
+        provider: new GoogleLoginProvider(
+            '357461672895-2mevm3b10b4bd3gjdvugl00up8ba2n4m.apps.googleusercontent.com'
+        )
+    },
+    {
+        id: FacebookLoginProvider.PROVIDER_ID,
+        provider: new FacebookLoginProvider('117715354940616')
+    }
+]);
+export function provideConfig() {
+    return config;
 }
 
 @NgModule({
@@ -88,12 +102,14 @@ export function authHttpServiceFactory(http: Http, options: RequestOptions) {
         PodcastAddUrlFormComponent,
         DebugComponent,
         SidebarComponent,
-        CallbackComponent,
         RegisterComponent,
         ResetComponent,
         ProfileComponent,
         AboutComponent,
-        FooterComponent
+        FooterComponent,
+        FooterPlayerComponent,
+        HumaniseTimePipe,
+        SideOverlayComponent
     ],
     imports: [
         BrowserModule,
@@ -107,7 +123,7 @@ export function authHttpServiceFactory(http: Http, options: RequestOptions) {
         }),
         AngularFireDatabaseModule,
         AngularFireAuthModule,
-
+        HttpClientModule,
         AppRoutingModule,
         HttpModule,
         FormsModule,
@@ -118,6 +134,7 @@ export function authHttpServiceFactory(http: Http, options: RequestOptions) {
         ToastyModule.forRoot(),
         DropzoneModule,
         ClipboardModule,
+        SocialLoginModule,
 
         StoreModule.forRoot(reducers),
 
@@ -131,12 +148,17 @@ export function authHttpServiceFactory(http: Http, options: RequestOptions) {
         })
     ],
     providers: [
-        AuthService,
+        PodnomsAuthService,
+        UiStateService,
         AuthGuard,
         {
-            provide: AuthHttp,
-            useFactory: authHttpServiceFactory,
-            deps: [Http, RequestOptions]
+            provide: HTTP_INTERCEPTORS,
+            useClass: PodNomsApiInterceptor,
+            multi: true
+        },
+        {
+            provide: AuthServiceConfig,
+            useFactory: provideConfig
         },
         SignalRService,
         ProfileService,
@@ -148,6 +170,7 @@ export function authHttpServiceFactory(http: Http, options: RequestOptions) {
         ChatterService,
         AppInsightsService,
         JobsService,
+        AudioService,
         GlobalsService
     ],
     bootstrap: [AppComponent]
