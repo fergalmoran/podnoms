@@ -10,6 +10,7 @@ import {
 import { Component, NgZone, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs/Subscription';
+import { TwitterLoginService } from 'app/services/twitter-login.service';
 
 @Component({
     templateUrl: './login.component.html',
@@ -29,8 +30,9 @@ export class LoginComponent implements OnInit {
         private _authService: PodnomsAuthService,
         private _socialAuthService: AuthService,
         private _activatedRoute: ActivatedRoute,
+        private _twitterLoginService: TwitterLoginService,
         private _router: Router
-    ) { }
+    ) {}
     ngOnInit() {
         this._subscription = this._activatedRoute.queryParams.subscribe(
             (param: any) => {
@@ -45,41 +47,55 @@ export class LoginComponent implements OnInit {
             const options: LoginOpt = {
                 scope: 'email public_profile'
             };
-            this._socialAuthService.signIn( FacebookLoginProvider.PROVIDER_ID, options)
-                .then(user => {
+            this._socialAuthService
+                .signIn(FacebookLoginProvider.PROVIDER_ID, options)
+                .then((user) => {
                     if (user) {
-                        const rpc = this._authService.facebookLogin(user.authToken);
-                        if (!rpc) return;
-                        rpc.finally(() => (this.isRequesting = false)).subscribe(
-                            (result) => {
-                                if (result) {
-                                    this._router.navigate(['/podcasts']);
-                                }
-                            },
-                            (error) => {
-                                this.errorMessage = error;
-                            }
+                        const rpc = this._authService.facebookLogin(
+                            user.authToken
                         );
+                        if (!rpc) return;
+                        rpc
+                            .finally(() => (this.isRequesting = false))
+                            .subscribe(
+                                (result) => {
+                                    if (result) {
+                                        this._router.navigate(['/podcasts']);
+                                    }
+                                },
+                                (error) => {
+                                    this.errorMessage = error;
+                                }
+                            );
                     }
                 });
         } else if (provider === 'google-oauth2') {
-            this._socialAuthService.signIn(GoogleLoginProvider.PROVIDER_ID)
-                .then(user => {
+            this._socialAuthService
+                .signIn(GoogleLoginProvider.PROVIDER_ID)
+                .then((user) => {
                     if (user) {
                         const rpc = this._authService.googleLogin(user.idToken);
                         if (!rpc) return;
-                        rpc.finally(() => (this.isRequesting = false)).subscribe(
-                            (result) => {
-                                if (result) {
-                                    this._router.navigate(['/podcasts']);
+                        rpc
+                            .finally(() => (this.isRequesting = false))
+                            .subscribe(
+                                (result) => {
+                                    if (result) {
+                                        this._router.navigate(['/podcasts']);
+                                    }
+                                },
+                                (error) => {
+                                    this.errorMessage = error;
                                 }
-                            },
-                            (error) => {
-                                this.errorMessage = error;
-                            }
-                        );
+                            );
                     }
                 });
+        } else if (provider === 'twitter') {
+            this._twitterLoginService
+                .getAuthToken()
+                .subscribe((r) =>
+                    console.log('login.component', 'twitterLogin', r)
+                );
         } else {
             this._authService
                 .login(this.username, this.password)

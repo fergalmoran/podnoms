@@ -68,6 +68,7 @@ import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { PodNomsApiInterceptor } from './interceptors/podnoms-api.interceptor';
 import { SideOverlayComponent } from './components/side-overlay/side-overlay.component';
 import { UiStateService } from './services/ui-state.service';
+import { TwitterLoginService } from './services/twitter-login.service';
 
 const config = new AuthServiceConfig([
     {
@@ -171,7 +172,8 @@ export function provideConfig() {
         AppInsightsService,
         JobsService,
         AudioService,
-        GlobalsService
+        GlobalsService,
+        TwitterLoginService
     ],
     bootstrap: [AppComponent]
 })
