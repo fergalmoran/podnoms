@@ -18,13 +18,14 @@ namespace PodNoms.Api.Controllers {
     public class ProfileController : BaseAuthController {
 
         public IUnitOfWork _unitOfWork { get; }
-
-
         public IMapper _mapper { get; }
+        private readonly IEntryRepository _entryRepository;
 
         public ProfileController(IMapper mapper, IUnitOfWork unitOfWork,
+                    IEntryRepository entryRepository,
                 UserManager<ApplicationUser> userManager, IHttpContextAccessor contextAccessor)
             : base(contextAccessor, userManager) {
+            this._entryRepository = entryRepository;
             this._mapper = mapper;
             this._unitOfWork = unitOfWork;
         }
@@ -52,6 +53,20 @@ namespace PodNoms.Api.Controllers {
                 return NotFound();
 
             return Ok();
+        }
+
+        [HttpGet("limits")]
+        public async Task<ActionResult<ProfileLimitsViewModel>> GetProfileLimits() {
+            var entries = await _entryRepository.GetAllForUserAsync(_applicationUser.Id);
+            var user = _mapper.Map<ApplicationUser, ProfileViewModel>(_applicationUser);
+            var sum = entries.Select(x => x.AudioFileSize)
+                .Sum();
+            var vm = new ProfileLimitsViewModel {
+                StorageQuota = 5368709120, //5Gb
+                StorageUsed = sum,
+                User = user
+            };
+            return Ok(vm);
         }
     }
 }

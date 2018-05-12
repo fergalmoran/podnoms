@@ -37,15 +37,16 @@ namespace PodNoms.Api.Services.Jobs {
             this._logger = logger.CreateLogger<ProcessPlaylistsJob>();
         }
 
-        public async Task Execute() {
+        public async Task<bool> Execute() {
             var playlists = _playlistRepository.GetAll()
                 .ToList();
 
             foreach (var playlist in playlists) {
                 await Execute(playlist.Id);
             }
+            return true;
         }
-        public async Task Execute(int playlistId) {
+        public async Task<bool> Execute(int playlistId) {
             try {
                 var playlist = await _playlistRepository.GetAsync(playlistId);
                 var resultList = new List<ParsedItemResult>();
@@ -62,7 +63,7 @@ namespace PodNoms.Api.Services.Jobs {
                     } else if (MixcloudParser.ValidateUrl(playlist.SourceUrl)) {
                         resultList = await _mixcloudParser.GetEntries(playlist.SourceUrl);
                     }
-                    if (resultList != null) { 
+                    if (resultList != null) {
                         //order in reverse so the newest item is added first
                         foreach (var item in resultList?.OrderBy(r => r.UploadDate)) {
                             if (!playlist.ParsedPlaylistItems.Any(p => p.VideoId == item.Id)) {
@@ -76,9 +77,11 @@ namespace PodNoms.Api.Services.Jobs {
                         }
                     }
                 }
+                return true;
             } catch (Exception ex) {
                 _logger.LogError(ex.Message);
             }
+            return false;
         }
     }
 }

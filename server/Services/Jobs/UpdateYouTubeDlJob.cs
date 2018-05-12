@@ -10,12 +10,12 @@ namespace PodNoms.Api.Services.Jobs {
         private readonly IMailSender _sender;
         private readonly ILogger _logger;
 
-        public UpdateYouTubeDlJob(IMailSender sender, ILogger<UpdateYouTubeDlJob> logger){
+        public UpdateYouTubeDlJob(IMailSender sender, ILogger<UpdateYouTubeDlJob> logger) {
             this._sender = sender;
             this._logger = logger;
         }
 
-        public async Task Execute() {
+        public async Task<bool> Execute() {
             _logger.LogInformation("Updating YoutubeDL");
 
             var yt = new YoutubeDL();
@@ -24,6 +24,7 @@ namespace PodNoms.Api.Services.Jobs {
 
             var results = await _sender.SendEmailAsync("fergal.moran@gmail.com", "PodNoms: UpdateYouTubeDlJob completed", "As you were");
             _logger.LogInformation($"{results}");
+            return true;
         }
     }
 }

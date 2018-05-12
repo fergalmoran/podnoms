@@ -26,7 +26,7 @@ namespace PodNoms.Api.Services.Jobs {
             this._logger = logger.CreateLogger<ClearOrphanAudioJob>();
         }
 
-        public async Task Execute() {
+        public async Task<bool> Execute() {
             try {
                 CloudStorageAccount storageAccount = CloudStorageAccount.Parse(_storageSettings.ConnectionString);
                 CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
@@ -49,9 +49,11 @@ namespace PodNoms.Api.Services.Jobs {
                     }
                 }
                 await this._mailSender.SendEmailAsync("fergal.moran@gmail.com", $"ClearOrphanAudioJob: Complete {blobCount}", string.Empty);
+                return true;
             } catch (Exception ex) {
                 _logger.LogError($"Error clearing orphans\n{ex.Message}");
             }
+            return false;
         }
     }
 }

@@ -10,6 +10,6 @@ namespace PodNoms.Api.Models.ViewModels {
         public string ImageUrl { get; set; }
         public string ThumbnailUrl { get; set; }
         public string RssUrl { get; set; }
-        // public ICollection<PodcastEntryViewModel> PodcastEntries { get; set; }
+        public ICollection<PodcastEntryViewModel> PodcastEntries { get; set; }
     }
 }
