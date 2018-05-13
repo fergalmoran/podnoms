@@ -34,14 +34,15 @@ namespace PodNoms.Api.Services.Jobs {
             this._logger = logger;
         }
         [Mutex("ProcessPlaylistItemJob")]
-        public async Task Execute() {
+        public async Task<bool> Execute() {
             var items = await _playlistRepository.GetUnprocessedItems();
             foreach (var item in items) {
                 await ExecuteForItem(item.VideoId, item.Playlist.Id);
             }
+            return true;
         }
         [Mutex("ProcessPlaylistItemJob")]
-        public async Task ExecuteForItem(string itemId, int playlistId) {
+        public async Task<bool> ExecuteForItem(string itemId, int playlistId) {
             var item = await _playlistRepository.GetParsedItem(itemId, playlistId);
             if (item != null && !string.IsNullOrEmpty(item.VideoType) &&
                 (item.VideoType.Equals("youtube") || item.VideoType.Equals("mixcloud"))) {
@@ -80,9 +81,11 @@ namespace PodNoms.Api.Services.Jobs {
                         }
                     } else {
                         _logger.LogError($"Processing playlist item {itemId} failed");
+                        return false;
                     }
                 }
             }
+            return true;
         }
     }
 }

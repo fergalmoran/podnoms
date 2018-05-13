@@ -15,6 +15,7 @@ using PodNoms.Api.Services.Realtime;
 using PodNoms.Api.Utils.Extensions;
 
 namespace PodNoms.Api.Services.Storage {
+
     internal class AzureFileUploader : IFileUploader {
         private readonly StorageSettings _settings;
         public AzureFileUploader(IOptions<StorageSettings> settings, ILoggerFactory logger) {

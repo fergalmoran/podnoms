@@ -42,7 +42,8 @@ namespace PodNoms.Api.Services.Processor {
                     localFile = entry.AudioUrl;
 
                 if (File.Exists(localFile)) {
-                    var fileName = new FileInfo(localFile).Name;
+                    FileInfo fileInfo = new FileInfo(localFile);
+                    var fileName = fileInfo.Name;
                     await _fileUploader.UploadFile(localFile, _audioStorageSettings.ContainerName, fileName,
                         "application/mpeg",
                         async (p, t) => {
@@ -60,6 +61,7 @@ namespace PodNoms.Api.Services.Processor {
                     entry.Processed = true;
                     entry.ProcessingStatus = ProcessingStatus.Processed;
                     entry.AudioUrl = $"{_audioStorageSettings.ContainerName}/{fileName}";
+                    entry.AudioFileSize = fileInfo.Length;
                     await _unitOfWork.CompleteAsync();
                     await _sendProcessCompleteMessage(entry);
                     return true;

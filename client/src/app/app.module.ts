@@ -18,6 +18,7 @@ import { AngularFireAuthModule } from 'angularfire2/auth';
 import { AngularFireModule } from 'angularfire2';
 import { AngularFirestoreModule } from 'angularfire2/firestore';
 import { QuillModule } from 'ngx-quill';
+import { EasyPieChartModule } from 'ng2modules-easypiechart';
 
 import { SocialLoginModule, AuthServiceConfig } from 'angularx-social-login';
 import {
@@ -81,6 +82,7 @@ import { BoilerplateComponent } from './components/boilerplate/boilerplate.compo
 import { BasePageComponent } from './components/base-page/base-page.component';
 import { ChatWidgetComponent } from './components/chat-widget/chat-widget.component';
 import { ChatService } from 'app/services/chat.service';
+import { BytesToHumanPipe } from './pipes/bytes-to-human.pipe';
 
 const cookieConfig: NgcCookieConsentConfig = {
     cookie: {
@@ -130,6 +132,7 @@ export function provideConfig() {
         NavbarComponent,
 
         FilterEntryPipe,
+        BytesToHumanPipe,
         OrderByPipe,
         PrettyPrintPipe,
         EntryListItemComponent,
@@ -148,7 +151,8 @@ export function provideConfig() {
         SideOverlayComponent,
         BoilerplateComponent,
         BasePageComponent,
-        ChatWidgetComponent
+        ChatWidgetComponent,
+        BytesToHumanPipe
     ],
     imports: [
         BrowserModule,
@@ -172,6 +176,7 @@ export function provideConfig() {
         InlineEditorModule,
         MomentModule,
         QuillModule,
+        EasyPieChartModule,
         ModalModule.forRoot(),
         ProgressbarModule.forRoot(),
         ToastyModule.forRoot(),

@@ -255,6 +255,7 @@ namespace PodNoms.Api {
             services.AddScoped<IAudioUploadProcessService, AudioUploadProcessService>();
             services.AddScoped<ISupportChatService, SupportChatService>();
             services.AddScoped<IMailSender, MailgunSender>();
+            services.AddScoped<IFileUtilities, AzureFileUtilities>();
             services.AddScoped<YouTubeParser>();
             services.AddScoped<MixcloudParser>();
             services.AddScoped<SlackSupportClient>();
