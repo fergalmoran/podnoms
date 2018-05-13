@@ -46,13 +46,9 @@ namespace PodNoms.Api.Controllers {
         }
 
         [HttpGet("checkslug/{slug}")]
-        public async Task<IActionResult> CheckSlug(string slug) {
+        public async Task<ActionResult<bool>> CheckSlug(string slug) {
             var slugValid = await _userManager.CheckSlug(slug);
-
-            if (slugValid)
-                return NotFound();
-
-            return Ok();
+            return Ok(slugValid);
         }
 
         [HttpGet("limits")]

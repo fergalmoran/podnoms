@@ -49,6 +49,8 @@ namespace PodNoms.Api.Services.Jobs {
         public async Task<bool> Execute(int playlistId) {
             try {
                 var playlist = await _playlistRepository.GetAsync(playlistId);
+                if (playlist == null)
+                    return false;
                 var resultList = new List<ParsedItemResult>();
 
                 var downloader = new AudioDownloader(playlist.SourceUrl, _helpersSettings.Downloader);
